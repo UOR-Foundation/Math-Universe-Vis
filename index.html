@@ -1,0 +1,670 @@
+        function drawEnergyFlow(n, t) {
+            const resonance = calculateResonance(n);
+            const pageInfo = getPageInfo(n);
+            const colorShift = parseInt(controls.colorShift.value);
+            const pattern = getFieldPattern(n);
+            
+            // Initialize particles array if it doesn't exist
+            if (!particles.length && t < 100) {
+                particles = [];
+            }
+            
+            // Create flow particles
+            if (Math.random() < 0.2) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: 0,  // Start at top of screen
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: Math.random() * 2 + 1,
+                    life: 1,
+                    resonance: resonance,
+                    <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sacred Resonance</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(ellipse at center, #0a0a0a 0%, #000 100%);
+        }
+
+        .controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 100;
+            min-width: 200px;
+        }
+
+        .controls h3 {
+            margin-bottom: 15px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #00ffcc;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 12px;
+            color: #88ccff;
+        }
+
+        .control-group input[type="range"] {
+            width: 100%;
+            -webkit-appearance: none;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            outline: none;
+            border-radius: 3px;
+        }
+
+        .control-group input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 12px;
+            height: 12px;
+            background: #00ffcc;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .control-group select {
+            width: 100%;
+            padding: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        .info {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 300px;
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .info-value {
+            color: #00ffcc;
+            font-weight: bold;
+        }
+
+        .title {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-size: 24px;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            color: #00ffcc;
+            text-shadow: 0 0 20px rgba(0, 255, 204, 0.5);
+        }
+
+        .subtitle {
+            position: fixed;
+            top: 55px;
+            left: 20px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            color: #88ccff;
+            opacity: 0.7;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas"></canvas>
+    
+    <div class="title pulse">Sacred Resonance</div>
+    <div class="subtitle">Mathematical Patterns of the Cosmos</div>
+    <div class="subtitle">https://uor.foundation</div>
+
+    
+    <div class="controls">
+        <h3>Controls</h3>
+        
+        <div class="control-group">
+            <label>Visualization Mode</label>
+            <select id="mode">
+                <option value="resonance">Resonance Fields</option>
+                <option value="interference">Quantum Interference</option>
+                <option value="sacred">Sacred Geometry</option>
+                <option value="flow">Energy Flow</option>
+                <option value="prime">Prime Spiral</option>
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>Frequency: <span id="freqValue">77</span></label>
+            <input type="range" id="frequency" min="1" max="256" value="77">
+        </div>
+        
+        <div class="control-group">
+            <label>Complexity: <span id="complexValue">5</span></label>
+            <input type="range" id="complexity" min="1" max="10" value="5">
+        </div>
+        
+        <div class="control-group">
+            <label>Speed: <span id="speedValue">50</span></label>
+            <input type="range" id="speed" min="0" max="100" value="50">
+        </div>
+        
+        <div class="control-group">
+            <label>Color Shift</label>
+            <input type="range" id="colorShift" min="0" max="360" value="0">
+        </div>
+    </div>
+    
+    <div class="info">
+        <div>Current Number: <span class="info-value" id="currentNumber">77</span></div>
+        <div>Field Pattern: <span class="info-value" id="fieldPattern">01001101</span></div>
+        <div>Resonance: <span class="info-value" id="resonance">0.161</span></div>
+        <div>Active Fields: <span class="info-value" id="activeFields">I, φ, ½, θ</span></div>
+    </div>
+
+    <script>
+        // Mathematical Universe implementation (hidden from user)
+        const FIELD_CONSTANTS = [
+            1.0,                    // Identity
+            1.8392867552141612,     // Tribonacci  
+            1.618033988749895,      // Golden ratio
+            0.5,                    // Half
+            0.15915494309189535,    // 1/2π
+            6.283185307179586,      // 2π
+            0.199612,               // Phase
+            0.014134725             // Zeta
+        ];
+
+        const FIELD_NAMES = ['I', 'T', 'φ', '½', '1/2π', '2π', 'θ', 'ζ'];
+
+        function getFieldPattern(n) {
+            const pattern = [];
+            const byte = n % 256;
+            for (let i = 0; i < 8; i++) {
+                pattern.push((byte >> i) & 1);
+            }
+            return pattern;
+        }
+
+        function calculateResonance(n) {
+            const pattern = getFieldPattern(n);
+            let resonance = 1.0;
+            for (let i = 0; i < 8; i++) {
+                if (pattern[i]) {
+                    resonance *= FIELD_CONSTANTS[i];
+                }
+            }
+            return resonance;
+        }
+
+        function getActiveFieldNames(n) {
+            const pattern = getFieldPattern(n);
+            const active = [];
+            for (let i = 0; i < 8; i++) {
+                if (pattern[i]) active.push(FIELD_NAMES[i]);
+            }
+            return active.join(', ') || 'None';
+        }
+
+        function getPageInfo(n) {
+            const page = Math.floor(n / 48);
+            const offset = n % 48;
+            const isLagrange = [0, 1, 48, 49].includes(n % 256);
+            return { page, offset, isLagrange };
+        }
+
+        // Visualization
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let time = 0;
+        let particles = [];
+        let fieldLines = [];
+
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        // Controls
+        const controls = {
+            mode: document.getElementById('mode'),
+            frequency: document.getElementById('frequency'),
+            complexity: document.getElementById('complexity'),
+            speed: document.getElementById('speed'),
+            colorShift: document.getElementById('colorShift')
+        };
+
+        const displays = {
+            freqValue: document.getElementById('freqValue'),
+            complexValue: document.getElementById('complexValue'),
+            speedValue: document.getElementById('speedValue'),
+            currentNumber: document.getElementById('currentNumber'),
+            fieldPattern: document.getElementById('fieldPattern'),
+            resonance: document.getElementById('resonance'),
+            activeFields: document.getElementById('activeFields')
+        };
+
+        // Update displays
+        function updateDisplays() {
+            const freq = parseInt(controls.frequency.value);
+            displays.freqValue.textContent = freq;
+            displays.complexValue.textContent = controls.complexity.value;
+            displays.speedValue.textContent = controls.speed.value;
+            displays.currentNumber.textContent = freq;
+            
+            const pattern = getFieldPattern(freq);
+            displays.fieldPattern.textContent = pattern.reverse().join('');
+            displays.resonance.textContent = calculateResonance(freq).toFixed(3);
+            displays.activeFields.textContent = getActiveFieldNames(freq);
+        }
+
+        // Event listeners
+        Object.values(controls).forEach(control => {
+            control.addEventListener('input', updateDisplays);
+        });
+
+        updateDisplays();
+
+        // Visualization functions
+        function drawResonanceField(n, t) {
+            const pattern = getFieldPattern(n);
+            const resonance = calculateResonance(n);
+            const colorShift = parseInt(controls.colorShift.value);
+            
+            // Create concentric ripples based on active fields
+            ctx.save();
+            ctx.globalCompositeOperation = 'lighter';
+            
+            // Draw field waves
+            for (let i = 0; i < 8; i++) {
+                if (pattern[i]) {
+                    const fieldStrength = FIELD_CONSTANTS[i];
+                    const hue = (i * 45 + colorShift) % 360;
+                    
+                    // Draw multiple ripples for this field
+                    for (let ring = 0; ring < 8; ring++) {
+                        const radius = (ring * 80 + t * fieldStrength * 3) % (Math.max(width, height) * 1.5);
+                        const alpha = Math.max(0, 1 - radius / Math.max(width, height)) * 0.2;
+                        
+                        ctx.beginPath();
+                        ctx.arc(width/2, height/2, radius, 0, Math.PI * 2);
+                        ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${alpha})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                    
+                    // Add some glowing points at field positions
+                    const angle = (i / 8) * Math.PI * 2;
+                    const distance = 200 + Math.sin(t * 0.01 * fieldStrength) * 50;
+                    const px = width/2 + Math.cos(angle) * distance;
+                    const py = height/2 + Math.sin(angle) * distance;
+                    
+                    const gradient = ctx.createRadialGradient(px, py, 0, px, py, 30);
+                    gradient.addColorStop(0, `hsla(${hue}, 100%, 70%, 0.8)`);
+                    gradient.addColorStop(0.5, `hsla(${hue}, 80%, 50%, 0.3)`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(px - 30, py - 30, 60, 60);
+                }
+            }
+            
+            // Add subtle interference pattern in center
+            const centerGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, 300);
+            const baseHue = (resonance * 100 + colorShift) % 360;
+            centerGradient.addColorStop(0, `hsla(${baseHue}, 50%, 50%, ${0.1 * Math.sin(t * 0.01) + 0.1})`);
+            centerGradient.addColorStop(0.5, `hsla(${baseHue}, 40%, 40%, 0.05)`);
+            centerGradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = centerGradient;
+            ctx.fillRect(width/2 - 300, height/2 - 300, 600, 600);
+            
+            ctx.restore();
+        }
+
+        function drawInterference(n, t) {
+            const pattern = getFieldPattern(n);
+            const colorShift = parseInt(controls.colorShift.value);
+            ctx.globalCompositeOperation = 'lighter';
+            
+            for (let i = 0; i < 8; i++) {
+                if (pattern[i]) {
+                    const angle = (i / 8) * Math.PI * 2 + t * 0.001 * FIELD_CONSTANTS[i];
+                    const x = width/2 + Math.cos(angle) * 200;
+                    const y = height/2 + Math.sin(angle) * 200;
+                    
+                    const gradient = ctx.createRadialGradient(x, y, 0, x, y, 300);
+                    const hue = (i * 45 + colorShift) % 360;
+                    gradient.addColorStop(0, `hsla(${hue}, 100%, 50%, 0.3)`);
+                    gradient.addColorStop(0.5, `hsla(${hue}, 100%, 50%, 0.1)`);
+                    gradient.addColorStop(1, 'transparent');
+                    
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, width, height);
+                }
+            }
+            
+            ctx.globalCompositeOperation = 'source-over';
+        }
+
+        function drawSacredGeometry(n, t) {
+            const pattern = getFieldPattern(n);
+            const complexity = parseInt(controls.complexity.value);
+            const colorShift = parseInt(controls.colorShift.value);
+            
+            ctx.save();
+            ctx.translate(width/2, height/2);
+            
+            for (let layer = 0; layer < complexity; layer++) {
+                for (let i = 0; i < 8; i++) {
+                    if (pattern[i]) {
+                        ctx.rotate((Math.PI * 2) / 8);
+                        
+                        const radius = 100 + layer * 50;
+                        const hue = (i * 45 + layer * 30 + colorShift) % 360;
+                        
+                        ctx.beginPath();
+                        for (let j = 0; j < 6; j++) {
+                            const angle = (j / 6) * Math.PI * 2 + t * 0.001 * (i + 1);
+                            const x = Math.cos(angle) * radius;
+                            const y = Math.sin(angle) * radius;
+                            if (j === 0) ctx.moveTo(x, y);
+                            else ctx.lineTo(x, y);
+                        }
+                        ctx.closePath();
+                        
+                        ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${0.5 - layer * 0.05})`;
+                        ctx.lineWidth = 2;
+                        ctx.stroke();
+                    }
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        function drawEnergyFlow(n, t) {
+            const resonance = calculateResonance(n);
+            const pageInfo = getPageInfo(n);
+            const colorShift = parseInt(controls.colorShift.value);
+            const pattern = getFieldPattern(n);
+            
+            // Create flow particles
+            if (Math.random() < 0.2) {
+                particles.push({
+                    x: Math.random() * width,
+                    y: 0,  // Start at top of screen
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: Math.random() * 2 + 1,
+                    life: 1,
+                    resonance: resonance,
+                    fieldIndex: Math.floor(Math.random() * 8)
+                });
+            }
+            
+            // Draw background field structure
+            ctx.save();
+            ctx.globalAlpha = 0.3;
+            
+            // Draw field nodes
+            for (let i = 0; i < 8; i++) {
+                if (pattern[i]) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const nodeX = width/2 + Math.cos(angle) * 150;
+                    const nodeY = height/2 + Math.sin(angle) * 150;
+                    
+                    const hue = (i * 45 + colorShift) % 360;
+                    
+                    // Node glow
+                    const nodeGradient = ctx.createRadialGradient(nodeX, nodeY, 0, nodeX, nodeY, 40);
+                    nodeGradient.addColorStop(0, `hsla(${hue}, 100%, 60%, 0.5)`);
+                    nodeGradient.addColorStop(1, 'transparent');
+                    ctx.fillStyle = nodeGradient;
+                    ctx.fillRect(nodeX - 40, nodeY - 40, 80, 80);
+                    
+                    // Connection lines
+                    ctx.strokeStyle = `hsla(${hue}, 70%, 50%, 0.2)`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(width/2, height/2);
+                    ctx.lineTo(nodeX, nodeY);
+                    ctx.stroke();
+                }
+            }
+            
+            ctx.restore();
+            
+            // Update and draw particles
+            particles = particles.filter(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                p.life -= 0.008;
+                
+                // Apply forces
+                if (pageInfo.isLagrange) {
+                    // Strong attraction to center for Lagrange points
+                    const dx = width/2 - p.x;
+                    const dy = height/2 - p.y;
+                    const dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist > 30) {
+                        p.vx += dx * 0.003;
+                        p.vy += dy * 0.003;
+                    }
+                } else if (pattern[p.fieldIndex]) {
+                    // Attraction to active field nodes
+                    const angle = (p.fieldIndex / 8) * Math.PI * 2;
+                    const targetX = width/2 + Math.cos(angle) * 150;
+                    const targetY = height/2 + Math.sin(angle) * 150;
+                    p.vx += (targetX - p.x) * 0.0015;
+                    p.vy += (targetY - p.y) * 0.0015;
+                }
+                
+                // Add some turbulence
+                p.vx += (Math.random() - 0.5) * 0.2;
+                p.vy += (Math.random() - 0.5) * 0.2;
+                
+                const hue = (p.fieldIndex * 45 + colorShift) % 360;
+                
+                // Draw particle
+                ctx.save();
+                ctx.globalAlpha = p.life;
+                
+                // Particle glow
+                const particleGradient = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 8);
+                particleGradient.addColorStop(0, `hsla(${hue}, 100%, 80%, 1)`);
+                particleGradient.addColorStop(0.5, `hsla(${hue}, 80%, 60%, 0.5)`);
+                particleGradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = particleGradient;
+                ctx.fillRect(p.x - 8, p.y - 8, 16, 16);
+                
+                // Core
+                ctx.fillStyle = `hsla(${hue}, 100%, 90%, 1)`;
+                ctx.fillRect(p.x - 1, p.y - 1, 2, 2);
+                
+                // Trail
+                ctx.strokeStyle = `hsla(${hue}, 70%, 60%, ${p.life * 0.5})`;
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x - p.vx * 8, p.y - p.vy * 8);
+                ctx.stroke();
+                
+                ctx.restore();
+                
+                return p.life > 0 && p.y < height + 20 && p.x > -20 && p.x < width + 20;
+            });
+            
+            // Draw central vortex if Lagrange point
+            if (pageInfo.isLagrange) {
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                
+                const vortexGradient = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, 150);
+                vortexGradient.addColorStop(0, `hsla(${colorShift}, 100%, 60%, 0.5)`);
+                vortexGradient.addColorStop(0.3, `hsla(${colorShift + 30}, 100%, 50%, 0.3)`);
+                vortexGradient.addColorStop(0.6, `hsla(${colorShift + 60}, 80%, 40%, 0.1)`);
+                vortexGradient.addColorStop(1, 'transparent');
+                
+                ctx.fillStyle = vortexGradient;
+                ctx.fillRect(width/2 - 150, height/2 - 150, 300, 300);
+                
+                // Rotating spiral effect
+                ctx.strokeStyle = `hsla(${colorShift}, 70%, 60%, 0.3)`;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                const spiralSteps = 100;
+                for (let i = 0; i < spiralSteps; i++) {
+                    const angle = (i / 10) + t * 0.01;
+                    const radius = i * 1.5;
+                    const x = width/2 + Math.cos(angle) * radius;
+                    const y = height/2 + Math.sin(angle) * radius;
+                    if (i === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+                
+                ctx.restore();
+            }
+            
+            // Display particle count for debugging
+            if (particles.length === 0 && t > 100) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.font = '12px monospace';
+                ctx.fillText('Generating energy particles...', 10, height - 10);
+            }
+        }
+
+        function drawPrimeSpiral(n, t) {
+            const colorShift = parseInt(controls.colorShift.value);
+            ctx.save();
+            ctx.translate(width/2, height/2);
+            
+            let angle = 0;
+            let radius = 0;
+            
+            for (let i = 1; i <= n * 5; i++) {
+                angle += 0.1;
+                radius = Math.sqrt(i) * 10;
+                
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                
+                const resonance = calculateResonance(i);
+                const size = Math.max(1, 5 - resonance);
+                
+                if (resonance < 1) {  // Likely prime
+                    const hue = (i * 10 + colorShift) % 360;
+                    ctx.fillStyle = `hsla(${hue}, 70%, 60%, 0.8)`;
+                    ctx.beginPath();
+                    ctx.arc(x, y, size, 0, Math.PI * 2);
+                    ctx.fill();
+                    
+                    // Connection lines
+                    if (i > 1) {
+                        const prevAngle = angle - 0.1;
+                        const prevRadius = Math.sqrt(i - 1) * 10;
+                        const prevX = Math.cos(prevAngle) * prevRadius;
+                        const prevY = Math.sin(prevAngle) * prevRadius;
+                        
+                        ctx.strokeStyle = `hsla(${hue}, 70%, 40%, 0.2)`;
+                        ctx.beginPath();
+                        ctx.moveTo(prevX, prevY);
+                        ctx.lineTo(x, y);
+                        ctx.stroke();
+                    }
+                } else {
+                    ctx.fillStyle = `rgba(255, 255, 255, 0.1)`;
+                    ctx.fillRect(x - 1, y - 1, 2, 2);
+                }
+            }
+            
+            ctx.restore();
+        }
+
+        // Animation loop
+        function animate() {
+            time += parseInt(controls.speed.value) / 10;
+            
+            // Fade effect (adjusted for different modes)
+            const mode = controls.mode.value;
+            const fadeAlpha = mode === 'flow' || mode === 'prime' ? 0.02 : 0.08;
+            ctx.fillStyle = `rgba(0, 0, 0, ${fadeAlpha})`;
+            ctx.fillRect(0, 0, width, height);
+            
+            const n = parseInt(controls.frequency.value);
+            
+            switch(mode) {
+                case 'resonance':
+                    drawResonanceField(n, time);
+                    break;
+                case 'interference':
+                    drawInterference(n, time);
+                    break;
+                case 'sacred':
+                    drawSacredGeometry(n, time);
+                    break;
+                case 'flow':
+                    drawEnergyFlow(n, time);
+                    break;
+                case 'prime':
+                    drawPrimeSpiral(n, time);
+                    break;
+            }
+            
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
