@@ -1,24 +1,4 @@
-        function drawEnergyFlow(n, t) {
-            const resonance = calculateResonance(n);
-            const pageInfo = getPageInfo(n);
-            const colorShift = parseInt(controls.colorShift.value);
-            const pattern = getFieldPattern(n);
-            
-            // Initialize particles array if it doesn't exist
-            if (!particles.length && t < 100) {
-                particles = [];
-            }
-            
-            // Create flow particles
-            if (Math.random() < 0.2) {
-                particles.push({
-                    x: Math.random() * width,
-                    y: 0,  // Start at top of screen
-                    vx: (Math.random() - 0.5) * 3,
-                    vy: Math.random() * 2 + 1,
-                    life: 1,
-                    resonance: resonance,
-                    <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -163,8 +143,6 @@
     
     <div class="title pulse">Sacred Resonance</div>
     <div class="subtitle">Mathematical Patterns of the Cosmos</div>
-    <div class="subtitle">https://uor.foundation</div>
-
     
     <div class="controls">
         <h3>Controls</h3>
